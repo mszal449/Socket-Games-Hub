@@ -12,6 +12,8 @@ app.get('/', (req, res) => {
     res.status(200).send('Socket-Game-Hub')
 })
 
+// Setup static folder
+app.use(express.static('./public'));
 
 // Load port from .env
 const port = process.env.PORT || 3000
