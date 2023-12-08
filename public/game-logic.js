@@ -10,10 +10,10 @@ class Game {
             [0, 2, 0, 2, 0, 2, 0, 2],   // y = 0
             [2, 0, 2, 0, 2, 0, 2, 0],   // y = 1
             [0, 2, 0, 2, 0, 2, 0, 2],   // y = 2
-            [0, 0, 1, 0, 0, 0, 0, 0],   // y = 3
+            [0, 0, 0, 0, 0, 0, 0, 0],   // y = 3
             [0, 0, 0, 0, 0, 0, 0, 0],   // y = 4
             [1, 0, 1, 0, 1, 0, 1, 0],   // y = 5
-            [0, 1, 0, 0, 0, 1, 0, 1],   // y = 6
+            [0, 1, 0, 1, 0, 1, 0, 1],   // y = 6
             [1, 0, 1, 0, 1, 0, 1, 0]    // y = 7
         ]
         this.white_checkers_num = 12
@@ -127,19 +127,28 @@ class Game {
 
     // ---------------- getting input ----------------
     // todo: tu będzie kompletnie coś innego jak zmienię to na wersję serwerową z konsolowej - póki co śmieci
-
-    get_input() {
+    get_input_start() {
         const text = this.white_turn ? "Lights' turn\n" : "Darks' turn\n"
-        const x1 = parseInt(prompt(`${text}enter x coordinate of chosen checker:`));
-        const y1 = parseInt(prompt(`${text}enter y coordinate of chosen checker:`));
-        const x2 = parseInt(prompt(`${text}enter x coordinate of move destination:`));
-        const y2 = parseInt(prompt(`${text}enter y coordinate of move destination:`));
+        const old_x = parseInt(prompt(`${text}enter x coordinate of chosen checker:`));
+        const old_y = parseInt(prompt(`${text}enter y coordinate of chosen checker:`));
 
-        if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
+        if (isNaN(old_x) || isNaN(old_y)) {
             throw new Error('Invalid input: not a number');
         }
 
-        return [x1, y1, x2, y2];
+        return [old_x, old_y];
+    }
+
+    get_input_end() {
+        const text = this.white_turn ? "Lights' turn\n" : "Darks' turn\n"
+        const new_x = parseInt(prompt(`${text}enter x coordinate of move destination:`));
+        const new_y = parseInt(prompt(`${text}enter y coordinate of move destination:`));
+
+        if (isNaN(new_x) || isNaN(new_y)) {
+            throw new Error('Invalid input: not a number');
+        }
+
+        return [new_x, new_y];
     }
 
     print_available_moves(moves_list) {  // todo - do śmieci
@@ -152,32 +161,38 @@ class Game {
     }
 
     // ---------------- moves validation ----------------
-    // checker move from (old_x, old_y) to (new_x, new_y) with capture
-
-    move_validation(coords, moves_list) {
-        let old_x, old_y, new_x, new_y;
-        [old_x, old_y, new_x, new_y] = coords;
+    move_validation_start(coords, moves_list) {
+        let old_x, old_y
+        [old_x, old_y] = coords;
 
         for (let move of moves_list) {
             if (move.checker[0] === old_x && move.checker[1] === old_y) {
-                for (let end of move.ends) {
-                    if (end[0] === new_x && end[1] === new_y) {
-                        return true;
-                    }
-                }
-                console.log("choose destination square available for chosen checker");
-            } else {
-                console.log("choose your checker");
+                return move;
             }
         }
+        console.log("choose your checker");
+        return false;
+    }
+
+    move_validation_end(coords, moves_ends) {
+        let new_x, new_y
+        [new_x, new_y] = coords;
+
+        for (let end of moves_ends) {
+            if (end[0] === new_x && end[1] === new_y) {
+                return true;
+            }
+        }
+        console.log("choose available destination for chosen checker");
         return false;
     }
 
     // ---------------- making moves on board ----------------
 
-    make_move(coords, with_capture) {
+    make_move(start_coords, end_coords, with_capture) {
         let old_x, old_y, new_x, new_y;
-        [old_x, old_y, new_x, new_y] = coords;
+        [old_x, old_y] = start_coords;
+        [new_x, new_y] = end_coords;
         let checker = this.board[old_y][old_x]
         this.board[old_y][old_x] = 0
 
@@ -215,30 +230,39 @@ class Game {
         await new Promise(resolve => setTimeout(resolve, 100));
         try {
 
-            // moves - list of possible moves in current turn for active player
-            let possible_moves = this.check_capture_obligation_for_all()
-            if (possible_moves.length === 0) {
-                possible_moves = this.get_possible_moves_for_all()
+            // all_possible_moves - list of possible moves in current turn for active player
+            let all_possible_moves = this.check_capture_obligation_for_all()
+            if (all_possible_moves.length === 0) {
+                all_possible_moves = this.get_possible_moves_for_all()
                 with_capture = false
             }
-            this.print_available_moves(possible_moves)
-            let coords = this.get_input();
+            this.print_available_moves(all_possible_moves)
 
-            // check if chosen move is possible
-            while (!this.move_validation(coords, possible_moves)) {
-                coords = this.get_input();
+            // validate chosen checker
+            let start_coords = this.get_input_start();
+            let move_object = this.move_validation_start(start_coords, all_possible_moves)
+            while (!move_object) {
+                start_coords = this.get_input_start();
+                move_object = this.move_validation_start(start_coords, all_possible_moves)
+            }
+            console.log(`chosen checker: ${JSON.stringify(move_object.checker)} - you can go to ${JSON.stringify(move_object.ends)}`)
+
+            // validate destination square for chosen checker
+            let end_coords = this.get_input_end();
+            while (!this.move_validation_end(end_coords, move_object.ends)) {
+                end_coords = this.get_input_end();
             }
 
             // making a move
             if (!with_capture) {
-                this.make_move(coords, false)
+                this.make_move(start_coords, end_coords, false)
             } else {
-                // while capturing, we can make multiple moves in one turn
+                // while capturing, we can make multiple jumps in one turn
                 let old_x, old_y, new_x, new_y;
-                [old_x, old_y, new_x, new_y] = coords;
+                [old_x, old_y] = start_coords;
+                [new_x, new_y] = end_coords;
                 // possible moves for chosen checker
-                let moves_for_checker =
-                    possible_moves.filter(move => (move.checker[0] === old_x && move.checker[1] === old_y))[0].ends
+                let moves_for_checker = move_object.ends
                 // creating list of moves to be done (because only one capture is obligatory, not all possible)
                 let coords_id = -1;
                 for (let i = 0; i < moves_for_checker.length; i++) {
@@ -248,10 +272,10 @@ class Game {
                 }
                 let multiple_moves = moves_for_checker.slice(0, coords_id + 1);
                 // making moves from list
-                for (let move of multiple_moves) {
-                    this.make_move([old_x, old_y, move[0], move[1]], true)
-                    old_x = move[0];
-                    old_y = move[1];
+                for (let move_dest of multiple_moves) {
+                    this.make_move([old_x, old_y], move_dest, true)
+                    old_x = move_dest[0];
+                    old_y = move_dest[1];
                 }
             }
 
