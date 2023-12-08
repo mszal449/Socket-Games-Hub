@@ -1,31 +1,48 @@
 // Environmental variables configuration
-require('dotenv').config()
-
+import dotenv from 'dotenv'
+dotenv.config()
 
 // Express app setup
-const express = require('express')
+import express from 'express'
+import { fileURLToPath } from 'url'
+import path from 'path'
+import nunjucks from 'nunjucks'
+
+// Serve static files from the public directory
 const app = express()
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
+app.use(express.static(path.join(__dirname, 'public')))
 
-// Setup basic route
-app.get('/', (req, res) => {
-    res.status(200).send('Socket-Game-Hub')
+// Specify the path to your templates
+const templatePath = './public/views'
+
+// Create a Nunjucks environment
+const env = nunjucks.configure(templatePath, {
+    autoescape: true,
+    express: app,
 })
 
-// Setup static folder
-app.use(express.static('./public'));
+// App configuration
+app.use(express.json())
 
 // Load port from .env
 const port = process.env.PORT || 3000
 
+app.get("/game", (req, res) => {
+    res.render("game.html", {})
+})
+
 const start = async () => {
     try {
-        app.listen(port, ()=> {
+        app.listen(port, () => {
             console.log(`Server is listening on port ${port}`)
-        })
-    } catch (err){
+            console.log(`link: http://localhost:${port}/game`)
+        });
+    } catch (err) {
         console.log(err)
     }
-}
+};
 
 start()
