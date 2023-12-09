@@ -26,6 +26,9 @@
                     && game.selectedChecker.checker[0] === j
                     && game.selectedChecker.checker[1] === i) {
                     cell.classList.add('selected');
+
+                } else if (game.in_selected_checker_paths(j, i)) {
+                    cell.classList.add('target');
                 } else {
                     cell.classList.add(`background-${(i+j)%2}`);
                 }

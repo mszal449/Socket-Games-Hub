@@ -1,6 +1,9 @@
 .selected {
     background-color: #357c37;
 }
+.target {
+    background-color: #1b3b1b;
+}
 .background-0 {
     background-color: #9d9d9d;
 }

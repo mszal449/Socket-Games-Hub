@@ -2,6 +2,7 @@
 // rules from: https://www.ultraboardgames.com/checkers/game-rules.php?utm_content=cmp-true
 // todo: tę planszę się powinno odwrócić w widoku, żeby pionki gracza zawsze były na dole...
 
+
 class Game {
     constructor() {
         // 0 - empty, 1 - white, 2 - black, 3 - white king, 4 - black king
@@ -24,7 +25,6 @@ class Game {
         this.white_turn = true
         this.capture_obligation = false
         this.selectedChecker = null
-        this.selectedTarget = null
     }
 
     is_opposite_color(x, y) {
@@ -53,49 +53,68 @@ class Game {
         return this.board[y][x] > 2
     }
 
-    // ---------------- checking capture obligation logic ----------------
-    // checking capture obligation - returns list of (possibly) multiple jumps
-    check_capture_obligation(x, y, old_x, old_y, is_king) {
-        let res = [];
+    in_selected_checker_paths(x, y) {
+        if (this.selectedChecker) {
+            for (let path of this.selectedChecker.paths) {
+                for (let target of path) {
+                    if (target[0] === x && target[1] === y) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
 
-        let yis = this.white_turn ? [-1] : [1]
-        if (is_king) { // for kings, we also need to check backwards
-            yis = [-1, 1]
+    // ---------------- checking capture obligation logic ----------------
+
+    check_capture_obligation(x, y, old_x, old_y, is_king) {
+        let res = []; // list of available paths with capture for checker on [x, y]
+        let yis = this.white_turn ? [-1] : [1];
+
+        if (is_king) {
+            yis = [-1, 1]; // for kings, we need to check backwards
         }
 
         ([-1, 1]).forEach(xi => {
             (yis).forEach(yi => {
                 if (
-                    // coordinates validation
-                    this.in_board_bounds(x + xi, y + yi)
-                    && this.in_board_bounds(x + 2 * xi, y + 2 * yi)
-                    // squares content validation
-                    && this.is_opposite_color(x + xi, y + yi)
-                    && this.is_empty(x + 2 * xi, y + 2 * yi)
-                    // avoid circular checking for kings
-                    && ((old_x !== x + 2*xi) || (old_y !== y + 2*yi))
+                    this.in_board_bounds(x + xi, y + yi) &&
+                    this.in_board_bounds(x + 2 * xi, y + 2 * yi) &&
+                    this.is_opposite_color(x + xi, y + yi) &&
+                    this.is_empty(x + 2 * xi, y + 2 * yi) &&
+                    ((old_x !== x + 2 * xi) || (old_y !== y + 2 * yi))
                 ) {
                     let new_arr = this.check_capture_obligation(x + 2 * xi, y + 2 * yi, x, y, is_king);
-                    new_arr.unshift([x + 2 * xi, y + 2 * yi]);
-                    res = res.concat(new_arr);
+                    if (new_arr.length === 0) {
+                        // no more captures available, end path with current square
+                        res.push([[x + 2 * xi, y + 2 * yi]]);
+                    } else {
+                        // add current square to path
+                        new_arr.forEach(path => {
+                            path.unshift([x + 2 * xi, y + 2 * yi]);
+                            res.push(path);
+                        });
+                    }
                 }
-            })
+            });
         });
         return res;
     }
 
+
     // function checking capture obligation for every active checker
     // returns list of checkers that can capture and lists from check_capture_obligation for them
     check_capture_obligation_for_all() {
-        let res = [];
+        let res = [];   //  it will be the list of possible moves with capture
         ([...Array(8).keys()]).forEach(y => {
             ([...Array(8).keys()].filter(x => x % 2 !== y % 2)).forEach(x => {
                 if (this.is_active_color(x, y)) {
-                    let jumps = this.check_capture_obligation(x, y, -1, -1, this.is_king(x, y))
-                    if (jumps.length > 0) {
+                    let path = this.check_capture_obligation(x, y, -1, -1, this.is_king(x, y))
+                    if (path.length > 0) {
                         res.push({
                             checker: [x, y],    // coordinates of checker that can capture
-                            targets: jumps      // possible coordinates to go for it
+                            paths: path      // possible coordinates to go for it
                         })
                     }
                 }
@@ -122,7 +141,7 @@ class Game {
         });
         return {
             checker: [x, y],
-            targets: res
+            paths: [res]
         };
     }
 
@@ -152,13 +171,15 @@ class Game {
         return false;
     }
 
-    move_validation_target(coords, moves_targets) {
+    move_validation_target(coords, moves_paths) {
         let new_x, new_y
         [new_x, new_y] = coords;
 
-        for (let target of moves_targets) {
-            if (target[0] === new_x && target[1] === new_y) {
-                return true;
+        for (let path of moves_paths) {
+            for (let i = 0; i < path.length; i++) {
+                if (path[i][0] === new_x && path[i][1] === new_y) {
+                    return [path, i];
+                }
             }
         }
         console.log("choose available target for chosen checker");
@@ -167,51 +188,32 @@ class Game {
 
     // ---------------- making moves on board ----------------
 
-    make_move() {
-        let old_x, old_y, new_x, new_y;
-        [old_x, old_y] = this.selectedChecker.checker;
-        [new_x, new_y] = this.selectedTarget;
+    make_moves(path, target_index) {
+        for (let move of path.slice(0, target_index+1)) {
+            let [old_x, old_y] = this.selectedChecker.checker;
+            let [new_x, new_y] = move;
 
-        // moving checker
-        let checker = this.board[old_y][old_x]
-        this.board[old_y][old_x] = 0
+            // moving checker
+            let checker = this.board[old_y][old_x]
+            this.board[old_y][old_x] = 0
 
-        // upgrade checker to king
-        if ((checker <= 2) && (new_y === 0 || new_y === 7)) {
-            checker += 2
-        }
-        this.board[new_y][new_x] = checker
-
-        // capturing opponent's checker
-        if (this.capture_obligation) {
-            this.board[(old_y + new_y) / 2][(old_x + new_x) / 2] = 0
-            this.white_turn ? this.black_checkers_num-- : this.white_checkers_num--
-        }
-    }
-
-    make_move_with_capture() {
-        // while capturing, we can make multiple jumps in one turn
-        let new_x, new_y;
-        [new_x, new_y] = this.selectedTarget;
-        // possible moves for chosen checker
-        let moves_for_checker = this.selectedChecker.targets
-        // creating list of moves to be done (because only one capture is obligatory, not all possible)
-        let coords_id = -1;
-        for (let i = 0; i < moves_for_checker.length; i++) {
-            if ((moves_for_checker[i][0] === new_x) && (moves_for_checker[i][1] === new_y)) {
-                coords_id = i;
+            // upgrade checker to king
+            if ((checker <= 2) && (new_y === 0 || new_y === 7)) {
+                checker += 2
             }
-        }
-        let multiple_moves = moves_for_checker.slice(0, coords_id + 1);
-        // making moves from list
-        for (let move_target of multiple_moves) {
-            this.selectedTarget = move_target
-            this.make_move()
-            this.selectedChecker.checker = move_target
+            this.board[new_y][new_x] = checker
+
+            // capturing opponent's checker
+            if (this.capture_obligation) {
+                this.board[(old_y + new_y) / 2][(old_x + new_x) / 2] = 0
+                this.white_turn ? this.black_checkers_num-- : this.white_checkers_num--
+            }
+
+            this.selectedChecker.checker = [new_x, new_y]
         }
     }
 
-    // ---------------- game targeting ----------------
+    // ---------------- game ending ----------------
     is_game_over() {
         return (this.white_checkers_num === 0 || this.black_checkers_num === 0)
     }
@@ -224,7 +226,6 @@ class Game {
 
     end_turn() {
         this.selectedChecker = null
-        this.selectedTarget = null
         this.capture_obligation = false
         this.white_turn = !this.white_turn
     }
@@ -258,15 +259,11 @@ class Game {
         }
 
         // if checker is selected, we need to choose the target
-        else if (this.selectedTarget === null) {
-            if (this.move_validation_target(coords, this.selectedChecker.targets)) {
-                this.selectedTarget = coords
-                // making a move
-                if (!this.capture_obligation) {
-                    this.make_move()
-                } else {
-                    this.make_move_with_capture()
-                }
+        else {
+            let validation = this.move_validation_target(coords, this.selectedChecker.paths)
+            if (validation) {
+                let [path, target_index] = validation
+                this.make_moves(path, target_index)
                 this.end_turn()
             } else {
                 // changing chosen checker
@@ -274,10 +271,6 @@ class Game {
                     this.select_checker(coords)
                 }
             }
-        }
-
-        else {
-            console.error("Something went really wrong this time")
         }
     }
 }
