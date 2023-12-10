@@ -1,46 +1,46 @@
-const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
+import mongoose from 'mongoose'
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
 // User model
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
+        unique: [true, 'This username already exists'],
         required: [true, 'Please provide username'],
-        minlength: 5,
+        minlength: 3,
         maxlength: 50,
     },
     password: {
         type: String,
         required: [true, 'Please provide password'],
-        minlength: 6,
-    }
+        minlength: 8,
+    },
 })
 
 // Encrypt password on user creation
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function (next) {
     // Generate password salt
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(10)
     // Hash password
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-});
-
+    this.password = await bcrypt.hash(this.password, salt)
+    next()
+})
 
 // Create a token for user authentication
-UserSchema.methods.createJWT = function() {
+UserSchema.methods.createJWT = function () {
     return jwt.sign(
-        {userId: this._id, name: this.username},
+        { userId: this._id, username: this.username },
         process.env.JWT_SECRET,
-        {expiresIn: process.env.JWT_LIFETIME}
+        { expiresIn: process.env.JWT_LIFETIME }
     )
 }
 
-// Validate password
-UserSchema.methods.comparePasswords = async function(candidatePassword){
+// Validate given password
+UserSchema.methods.comparePasswords = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password)
 }
 
+// Export model
 const User = mongoose.model('User', UserSchema)
-
-module.exports = User
+export default User

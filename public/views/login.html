@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<div class="col-md-6 offset-md-3">
+    <div class="alerts"></div>
+    <h1>Login</h1>
+    <br>
+    <div class="error"></div>
+    <form>
+        <div class="form-group">
+            <label for="usernameInput">Username</label>
+            <input type="text" class="form-control" id="usernameInput" placeholder="Enter username">
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="passwordInput">Password</label>
+            <input type="password" class="form-control" id="passwordInput" placeholder="Enter password">
+        </div>
+        <br>
+        <br>
+        <button type="submit" class="btn btn-primary" >Login</button>
+    </form>
+</div>
+<script src="../login.js" type="module"></script>
+{% endblock %}
