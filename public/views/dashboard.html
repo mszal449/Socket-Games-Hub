@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Success</h1>
+{% if user %}
+<h2>User Data: {{ user | dump }}</h2>
+{% else %}
+<p>User data not available.</p>
+{% endif %}
+{% endblock %}
