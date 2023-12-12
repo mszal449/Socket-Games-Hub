@@ -14,7 +14,8 @@ import cors from 'cors'
 // Project imports
 import connectDB from './db/connectDB.js'
 import authRouter from './routers/authRouter.js'
-import mainRouter from './routers/mainRouter.js'
+import gameRouter from './routers/gameRouter.js'
+
 
 // Serve static files from the public directory
 const app = express()
@@ -38,11 +39,9 @@ app.use(cookieParser())
 
 
 // Routes
-app.use('/main', mainRouter)
+app.use('/game', gameRouter)
 app.use('/auth', authRouter)
-app.get("/game", (req, res) => {
-    res.render("game.html", {})
-})
+
 
 // Load port from .env
 const port = process.env.PORT || 3000

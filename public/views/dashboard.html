@@ -1,10 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Success</h1>
-{% if user %}
-<h2>User Data: {{ user | dump }}</h2>
-{% else %}
-<p>User data not available.</p>
-{% endif %}
+<div class="col-md-6 offset-md-3">
+    <h1>Games</h1>
+    {% if user %}
+    <h3>Hello {{ user.username }}</h3>
+    {% else %}
+    <p>User data not available.</p>
+    {% endif %}
+
+    <div class="games">
+<!--    Image can be added -->
+
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Checkers</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">Play checkers online!</h6>
+                <a href="#" class="btn btn-primary">Play</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

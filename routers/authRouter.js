@@ -7,7 +7,7 @@ const router = express.Router()
 router.get('/register', auth, (req, res) => {
     if (req.user && req.user.authenticated === true) {
         // If user is authenticated, redirect to dashboard
-        res.redirect('/main/dashboard')
+        res.redirect('/game/dashboard')
     } else {
         // If user is not authenticated, clear token and render register page
         res.clearCookie('token')
@@ -19,7 +19,7 @@ router.get('/register', auth, (req, res) => {
 router.get('/login', auth, (req, res) => {
     if (req.user && req.user.authenticated === true) {
         // If user is authenticated, redirect to dashboard
-        res.redirect('/main/dashboard')
+        res.redirect('/game/dashboard')
     } else {
         // If user is not authenticated, clear token and render login page
         res.clearCookie('token')

@@ -25,7 +25,7 @@ form.addEventListener('submit', async (e) => {
 
         if (response.status === 200) {
             // Success, redirect to dashboard page
-            location.assign('/main/dashboard')
+            location.assign('/game/dashboard')
         } else {
             // Failure, show alerts
             displayAlert(response.data.error);

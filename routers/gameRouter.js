@@ -14,5 +14,15 @@ router.get('/dashboard', auth, (req, res) => {
 })
 
 
+router.get("/checkers", auth, (req, res) => {
+    if (req.user && req.user.authenticated) {
+        // If user is authenticated, render the page
+        res.render("game.html", { user: req.user })
+    } else {
+        // Else redirect to login page
+        res.redirect('/auth/login');
+    }
+})
+
 export default router
 
