@@ -5,6 +5,7 @@ dotenv.config()
 // App configuration imports
 import express from 'express'
 import { fileURLToPath } from 'url'
+import {Server} from 'socket.io'
 import path from 'path'
 import nunjucks from 'nunjucks'
 import cookieParser from 'cookie-parser'
@@ -39,25 +40,36 @@ app.use(cookieParser())
 // Routes
 app.use('/main', mainRouter)
 app.use('/auth', authRouter)
+app.get("/game", (req, res) => {
+    res.render("game.html", {})
+})
 
 // Load port from .env
 const port = process.env.PORT || 3000
 
 // Start server
-app.get("/game", (req, res) => {
-    res.render("game.html", {})
-})
+const server = app.listen(port, () => {
+    console.log(`listening on http://localhost:${port}/game`);
+});
 
+const io = new Server(server);
+
+// Function to connect to the database
 const start = async () => {
     try {
         await connectDB(process.env.MONGO_URI);
-        console.log('Connected to the database')
-        app.listen(port, () => {
-            console.log(`Server is listening on port ${port}`)
-        })
+        console.log('Connected to the database');
     } catch (err) {
-        console.log(err)
+        console.log(err);
     }
-}
+};
 
-start()
+// Initiating the database connection
+start();
+
+// Handling socket connections
+io.on("connection", (socket) => {
+    console.log("A user connected to " + socket.id);
+});
+
+// export default io
