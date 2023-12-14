@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 
 // User model
@@ -26,15 +25,6 @@ UserSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt)
     next()
 })
-
-// Create a token for user authentication
-UserSchema.methods.createJWT = function () {
-    return jwt.sign(
-        { userId: this._id, username: this.username },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_LIFETIME }
-    )
-}
 
 // Validate given password
 UserSchema.methods.comparePasswords = async function (candidatePassword) {

@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 
 // Register user
 const register = async (req, res) => {
-    const { username, password1, password2 } = req.body
+    const { username, password1, password2, returnUrl } = req.body
 
     // Check if all fields are filled out
     if (!username || !password1 || !password2) {
@@ -43,20 +43,14 @@ const register = async (req, res) => {
     // Create new user record in the database
     const user = await User.create(userData)
 
-    // Generate authentication token
-    const token = user.createJWT()
-
-    // Save token inside of a cookie
-    res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
-
-    // Redirect to the dashboard page
-    res.status(StatusCodes.CREATED)
-        .redirect('/main/dashboard')
+    // Save token inside a cookie and redirect
+    res.cookie('user', user.username, { signed: true })
+    res.status(StatusCodes.OK).json({ returnUrl: returnUrl})
 }
 
 // Login an existing user
 const login = async (req, res) => {
-    const { username, password } = req.body
+    const { username, password, returnUrl } = req.body
 
     // Check if username and password are given
     if (!username || !password) {
@@ -80,22 +74,14 @@ const login = async (req, res) => {
             .json({ error: 'Invalid username or password.' })
     }
 
-    // Generate token
-    const token = user.createJWT()
-    res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
-    res.status(StatusCodes.OK)
-        .json({ user: { username: user.username }, token })
+    // Save token inside a cookie and redirect
+    res.cookie('user', user.username, { signed: true })
+    res.status(StatusCodes.OK).json({ returnUrl: returnUrl})
 }
 
 // Log out user
 const logout = (req, res) => {
-    // Try deleting the authentication token and redirect to login page
-    try {
-        res.clearCookie('token')
-        res.status(StatusCodes.OK).redirect('/auth/login')
-    } catch (err) {
-        res.status(StatusCodes.BAD_REQUEST).redirect('/auth/login')
-    }
+    res.clearCookie('user').redirect('/auth/login')
 }
 
 

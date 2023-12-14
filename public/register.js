@@ -21,16 +21,16 @@ form.addEventListener('submit', async (e) => {
             username: username.value,
             password1: password1.value,
             password2: password2.value,
+            returnUrl: '/game/dashboard'
         })
 
-        if (response.status === 200) {
-            // Success, redirect to dashboard page
-            location.assign('/main/dashboard')
-        } else {
+        // Redirect or handle error
+        if (response.data.error) {
             // Failure, show alerts
             displayAlert(response.data.error);
+        } else {
+            location.assign(response.data.returnUrl)
         }
-
     } catch (error) {
         // Handle errors
         if (error.response && error.response.data) {
@@ -40,6 +40,7 @@ form.addEventListener('submit', async (e) => {
         }
     }
 })
+
 
 // Display alert in alerts div
 const displayAlert = (message) => {

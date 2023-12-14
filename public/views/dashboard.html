@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="col-md-6 offset-md-3">
+
 <h1>Success</h1>
 {% if user %}
-<h2>User Data: {{ user | dump }}</h2>
+<h2>Hello {{ user.username }}</h2>
 {% else %}
 <p>User data not available.</p>
+</div>
 {% endif %}
 {% endblock %}

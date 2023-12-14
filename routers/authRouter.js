@@ -4,31 +4,29 @@ import auth from '../middleware/authentication.js'
 const router = express.Router()
 
 // Register page route
-router.get('/register', auth, (req, res) => {
-    if (req.user && req.user.authenticated === true) {
+router.get('/register', (req, res) => {
+    if (req.signedCookies.user) {
         // If user is authenticated, redirect to dashboard
-        res.redirect('/main/dashboard')
+        res.redirect('/game/dashboard')
     } else {
         // If user is not authenticated, clear token and render register page
-        res.clearCookie('token')
         res.render('register.html', { title: 'Register' })
     }
 })
 
 // Login page route
-router.get('/login', auth, (req, res) => {
-    if (req.user && req.user.authenticated === true) {
+router.get('/login', (req, res) => {
+    if (req.signedCookies.user) {
         // If user is authenticated, redirect to dashboard
-        res.redirect('/main/dashboard')
+        res.redirect('/game/dashboard')
     } else {
-        // If user is not authenticated, clear token and render login page
-        res.clearCookie('token')
-        res.render('login.html', { title: 'Login' })
+        // If user is not authenticated, clear token and render register page
+        res.render('login.html', {title: 'Login'})
     }
 })
 
 // Log out route
-router.get('/logout', logout)
+router.get('/logout', auth, logout)
 
 // Form submission routes
 router.post('/register', register)
