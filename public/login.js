@@ -18,14 +18,15 @@ form.addEventListener('submit', async (e) => {
         const response = await axios.post('/auth/login', {
             username: username.value,
             password: password.value,
+            returnUrl: '/game/dashboard'
         })
 
-        if (response.status === 200) {
-            // Success, redirect to dashboard page
-            location.assign('/game/dashboard')
-        } else {
+        // Redirect or handle error
+        if (response.data.error) {
             // Failure, show alerts
             displayAlert(response.data.error);
+        } else {
+            location.assign(response.data.returnUrl)
         }
     } catch (error) {
         // Handle errors

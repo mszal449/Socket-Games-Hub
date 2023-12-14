@@ -15,7 +15,7 @@ import cors from 'cors'
 import connectDB from './db/connectDB.js'
 import authRouter from './routers/authRouter.js'
 import gameRouter from './routers/gameRouter.js'
-
+import auth from './middleware/authentication.js'
 
 // Serve static files from the public directory
 const app = express()
@@ -35,11 +35,11 @@ nunjucks.configure(templatePath, {
 // App configuration
 app.use(express.json())
 app.use(cors())
-app.use(cookieParser())
+app.use(cookieParser(process.env.COOKIE_SECRET))
 
 
 // Routes
-app.use('/game', gameRouter)
+app.use('/game', auth, gameRouter)
 app.use('/auth', authRouter)
 
 
@@ -70,5 +70,3 @@ start();
 io.on("connection", (socket) => {
     console.log("A user connected to " + socket.id);
 });
-
-// export default io
