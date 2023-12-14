@@ -3,7 +3,8 @@ import { StatusCodes } from 'http-status-codes'
 
 // Register user
 const register = async (req, res) => {
-    const { username, password1, password2, returnUrl } = req.body
+    const { username, password1, password2} = req.body
+    const returnUrl = req.params.returnUrl || req.body.returnUrl
 
     // Check if all fields are filled out
     if (!username || !password1 || !password2) {
@@ -12,7 +13,7 @@ const register = async (req, res) => {
             .json({ error: 'All fields are required' })
     }
 
-    // Check if username is taken
+    // Check if username is available
     const check = await User.findOne({ username: username })
     if (check) {
         return res
@@ -50,7 +51,8 @@ const register = async (req, res) => {
 
 // Login an existing user
 const login = async (req, res) => {
-    const { username, password, returnUrl } = req.body
+    const { username, password } = req.body
+    const returnUrl = req.params.returnUrl || req.body.returnUrl
 
     // Check if username and password are given
     if (!username || !password) {
@@ -83,7 +85,6 @@ const login = async (req, res) => {
 const logout = (req, res) => {
     res.clearCookie('user').redirect('/auth/login')
 }
-
 
 export { register, login, logout }
 

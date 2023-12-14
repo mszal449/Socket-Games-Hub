@@ -3,7 +3,7 @@
 {% block content %}
 <div class="col-md-6 offset-md-3">
     <h1>Games</h1>
-    <h3>Hello {{ user.username }}</h3>
+    <h3>Hello {{ user }}</h3>
     <br>
     <div class="games">
 <!--    Image can be added -->
@@ -11,7 +11,7 @@
             <div class="card-body">
                 <h5 class="card-title">Checkers</h5>
                 <h6 class="card-subtitle mb-2 text-body-secondary">Play checkers online!</h6>
-                <a href="#" class="btn btn-primary">Play</a>
+                <a href="/game/checkers" class="btn btn-primary">Play</a>
             </div>
         </div>
     </div>
