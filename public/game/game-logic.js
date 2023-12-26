@@ -18,6 +18,7 @@ class Game {
             [1, 0, 1, 0, 1, 0, 1, 0]    // y = 7
         ]
 
+        // current number of checkers
         this.white_checkers_num = 12
         this.black_checkers_num = 12
 
@@ -27,6 +28,7 @@ class Game {
         this.selectedChecker = null
     }
 
+    // ---------------- helper functions ----------------
     is_opposite_color(x, y) {
         let colors = this.white_turn ? [2, 4] : [1, 3]
         return colors.includes(this.board[y][x])
@@ -64,6 +66,18 @@ class Game {
             }
         }
         return false
+    }
+
+    // ---------------- updating state ----------------
+    gameStateUpdate(newGameState) {
+        this.board = newGameState.board
+
+        this.white_checkers_num = newGameState.white_checkers_num
+        this.black_checkers_num = newGameState.black_checkers_num
+
+        this.white_turn = newGameState.white_turn
+        this.capture_obligation = newGameState.capture_obligation
+        this.selectedChecker = newGameState.selectedChecker
     }
 
     // ---------------- checking capture obligation logic ----------------
@@ -246,32 +260,10 @@ class Game {
         }
     }
 
-    next_step(coords) {
-
-        // check if game is over
-        if (this.is_game_over()) {
-            console.log(`${this.get_winner()} won!`)
-        }
-
-        // if there is no checker selected yet in this turn
-        else if (this.selectedChecker === null) {
-            this.select_checker(coords)
-        }
-
-        // if checker is selected, we need to choose the target
-        else {
-            let validation = this.move_validation_target(coords, this.selectedChecker.paths)
-            if (validation) {
-                let [path, target_index] = validation
-                this.make_moves(path, target_index)
-                this.end_turn()
-            } else {
-                // changing chosen checker
-                if (this.is_active_color(coords[0], coords[1])) {
-                    this.select_checker(coords)
-                }
-            }
-        }
+    validate_and_make_move(path_and_coords) {
+        let [path, target_index] = path_and_coords
+        this.make_moves(path, target_index)
+        this.end_turn()
     }
 }
 export default Game;
