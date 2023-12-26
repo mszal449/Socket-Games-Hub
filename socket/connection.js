@@ -1,14 +1,17 @@
 import Game from "../public/game/game-logic.js";
-import * as cookie from "dotenv";
+import cookie from 'cookie'
+import cookieParser from "cookie-parser";
 
 const handleConnection = (io) => {
     let game = new Game();
 
     io.on("connection", (socket) => {
-        const cookies = cookie.parse(socket.handshake.headers.cookie);
-        console.log(`cookies: ${JSON.stringify(cookies)}`);
-        let user = cookies['user']
-        console.log(`A user ${user} connected to ` + socket.id);
+        // Parse cookies from the request headers
+        var cookies = cookie.parse(socket.handshake.headers.cookie)
+        let user = cookies.user
+        var extractedUsername = cookieParser.signedCookie(user, process.env.COOKIE_SECRET)
+
+        console.log(`A user ${extractedUsername} connected to ` + socket.id);
 
         if (!game.is_active()) {
             if (game.white_player !== user) {
