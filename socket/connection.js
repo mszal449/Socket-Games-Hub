@@ -1,14 +1,28 @@
 import Game from "../public/game/game-logic.js";
+import * as cookie from "dotenv";
 
 const handleConnection = (io) => {
     let game = new Game();
 
     io.on("connection", (socket) => {
-        console.log("A user connected to " + socket.id);
-        io.emit("gameUpdate", game)
+        const cookies = cookie.parse(socket.handshake.headers.cookie);
+        console.log(`cookies: ${JSON.stringify(cookies)}`);
+        let user = cookies['user']
+        console.log(`A user ${user} connected to ` + socket.id);
+
+        if (!game.is_active()) {
+            if (game.white_player !== user) {
+                console.log(`A user ${user} enter game`);
+                game.add_player(user)
+            }
+            io.emit("playerEntered")
+            io.emit('gameUpdate', game)
+        } else {
+            console.log("Maximum number of players in this game, sorry")
+        }
 
         socket.on('gameOver', () => {
-            console.log('koniec gry - serwer')
+            console.log('end game - server')
             io.emit('gameOver');
         });
 
@@ -26,8 +40,7 @@ const handleConnection = (io) => {
             console.log(`move checker from ${game.selectedChecker['checker'][0]}, ${game.selectedChecker['checker'][1]} to ${path[target_index]} - server`)
             //
             game.validate_and_make_move(path_and_coords)
-            socket.emit('moveDone', path_and_coords)
-            socket.broadcast.emit("gameUpdate", game)
+            io.emit("gameUpdate", game)
         })
     });
 };

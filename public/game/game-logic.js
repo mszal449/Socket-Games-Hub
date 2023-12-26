@@ -26,6 +26,10 @@ class Game {
         this.white_turn = true
         this.capture_obligation = false
         this.selectedChecker = null
+
+        // players
+        this.white_player = null
+        this.black_player = null
     }
 
     // ---------------- helper functions ----------------
@@ -51,8 +55,20 @@ class Game {
         return this.white_turn ? 'white' : 'black'
     }
 
+    active_player() {
+        if (this.white_turn) {
+            return this.white_player
+        } else {
+            return this.black_player
+        }
+    }
+
     is_king(x, y) {
         return this.board[y][x] > 2
+    }
+
+    is_active() {
+        return ((this.black_player !== null) && (this.white_player !== null));
     }
 
     in_selected_checker_paths(x, y) {
@@ -70,6 +86,7 @@ class Game {
 
     // ---------------- updating state ----------------
     gameStateUpdate(newGameState) {
+        console.log("gameStateUpdate - logic")
         this.board = newGameState.board
 
         this.white_checkers_num = newGameState.white_checkers_num
@@ -78,6 +95,9 @@ class Game {
         this.white_turn = newGameState.white_turn
         this.capture_obligation = newGameState.capture_obligation
         this.selectedChecker = newGameState.selectedChecker
+
+        this.white_player = newGameState.white_player
+        this.black_player = newGameState.black_player
     }
 
     // ---------------- checking capture obligation logic ----------------
@@ -234,6 +254,15 @@ class Game {
 
     get_winner() {
         return (this.white_checkers_num === 0 ? "white" : "black")
+    }
+
+    // ---------------- starting game ----------------
+    add_player(user) {
+        if (this.white_player) {
+            this.black_player = user
+        } else {
+            this.white_player = user
+        }
     }
 
     // ---------------- whole game logic ----------------

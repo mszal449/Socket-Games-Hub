@@ -2,7 +2,9 @@ import game from "./game.js"
 import {getInput} from "./getInput.js";
 
 const board = document.getElementById('board');
-const activePlayer = document.getElementById('activePlayer');
+const activeColor = document.getElementById('activePlayer');
+const white = document.getElementById('p_white');
+const black = document.getElementById('p_black');
 
 export function createBoard() {
     board.textContent = ''
@@ -30,6 +32,10 @@ export function createBoard() {
 }
 
 export function activePlayerUpdate() {
-    activePlayer.textContent = `${game.active_color_string()} turn!`
+    activeColor.textContent = `${game.active_color_string()} turn!`
 }
 
+export function playersUpdate() {
+    white.textContent = `white: ${game.white_player}`
+    black.textContent = `black: ${game.black_player}`
+}
