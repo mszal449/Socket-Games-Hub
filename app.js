@@ -16,6 +16,7 @@ import connectDB from './db/connectDB.js'
 import authRouter from './routers/authRouter.js'
 import gameRouter from './routers/gameRouter.js'
 import auth from './middleware/authentication.js'
+import handleConnection from "./socket/connection.js";
 
 // Serve static files from the public directory
 const app = express()
@@ -67,6 +68,4 @@ const start = async () => {
 start();
 
 // Handling socket connections
-io.on("connection", (socket) => {
-    console.log("A user connected to " + socket.id);
-});
+handleConnection(io);

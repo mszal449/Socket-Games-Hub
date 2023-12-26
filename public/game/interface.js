@@ -1,11 +1,11 @@
-import Game from "./game-logic.js";
+import game from "./game.js"
+import {getInput} from "./getInput.js";
 
-const socket = io('ws://localhost:3000')
-
-let game = new Game();
 const board = document.getElementById('board');
+const activePlayer = document.getElementById('activePlayer');
 
-function createBoard() {
+export function createBoard() {
+    board.textContent = ''
     for (let i = 0; i < game.board.length; i++) {
         const row = document.createElement('tr');
         for (let j = 0; j < game.board[i].length; j++) {
@@ -29,12 +29,7 @@ function createBoard() {
     }
 }
 
-// Function to handle cell clicks
-function getInput(x, y) {
-    game.next_step([x, y]);
-    // updating after every click
-    board.textContent = '';
-    createBoard();
+export function activePlayerUpdate() {
+    activePlayer.textContent = `${game.active_color_string()} turn!`
 }
 
-createBoard();
