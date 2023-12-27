@@ -86,7 +86,6 @@ class Game {
 
     // ---------------- updating state ----------------
     gameStateUpdate(newGameState) {
-        console.log("gameStateUpdate - logic")
         this.board = newGameState.board
 
         this.white_checkers_num = newGameState.white_checkers_num
@@ -201,7 +200,6 @@ class Game {
                 return move;
             }
         }
-        console.log("choose your checker");
         return false;
     }
 
@@ -216,7 +214,6 @@ class Game {
                 }
             }
         }
-        console.log("choose available target for chosen checker");
         return false;
     }
 
@@ -258,10 +255,10 @@ class Game {
 
     // ---------------- starting game ----------------
     add_player(user) {
-        if (this.white_player) {
-            this.black_player = user
-        } else {
+        if (this.white_player === null) {
             this.white_player = user
+        } else if (this.black_player === null) {
+            this.black_player = user
         }
     }
 
