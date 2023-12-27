@@ -36,6 +36,7 @@ export function activePlayerUpdate() {
 }
 
 export function playersUpdate() {
-    white.textContent = `white: ${game.white_player}`
-    black.textContent = `black: ${game.black_player}`
+    let wait_str = "waiting for player..."
+    white.textContent = `white: ${game.white_player || wait_str}`
+    black.textContent = `black: ${game.black_player || wait_str}`
 }

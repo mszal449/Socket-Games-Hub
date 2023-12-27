@@ -7,21 +7,21 @@ const handleConnection = (io) => {
 
     io.on("connection", (socket) => {
         // Parse cookies from the request headers
-        var cookies = cookie.parse(socket.handshake.headers.cookie)
-        let user = cookies.user
-        var extractedUsername = cookieParser.signedCookie(user, process.env.COOKIE_SECRET)
+        const cookies = cookie.parse(socket.handshake.headers.cookie);
+        const username = cookieParser.signedCookie(cookies.user, process.env.COOKIE_SECRET);
 
-        console.log(`A user ${extractedUsername} connected to ` + socket.id);
+        console.log(`A user ${username} connected to ` + socket.id);
 
-        if (!game.is_active()) {
-            if (game.white_player !== user) {
-                console.log(`A user ${user} enter game`);
-                game.add_player(user)
-            }
-            io.emit("playerEntered")
+        if (!([game.white_player, game.black_player].includes(username)) && !game.is_active()) {
+            // entering a game
+            game.add_player(username)
+        } if ([game.white_player, game.black_player].includes(username)) {
+            // entering a game OR refreshing screen
             io.emit('gameUpdate', game)
+            io.emit('playerEntered', username)
         } else {
-            console.log("Maximum number of players in this game, sorry")
+            // cant enter the game - two players are already in
+            socket.emit('cantEnter', username)
         }
 
         socket.on('gameOver', () => {
@@ -30,18 +30,11 @@ const handleConnection = (io) => {
         });
 
         socket.on('selectChecker', (coords) => {
-            // todo: wywalić console logi
-            console.log(`selected checker ${coords[0]}, ${coords[1]} - server`)
-            //
             game.select_checker(coords)
             socket.emit('checkerSelected', coords)
         });
 
         socket.on('moveChecker', (path_and_coords) => {
-            // todo: wywalić console logi
-            let [path, target_index] = path_and_coords
-            console.log(`move checker from ${game.selectedChecker['checker'][0]}, ${game.selectedChecker['checker'][1]} to ${path[target_index]} - server`)
-            //
             game.validate_and_make_move(path_and_coords)
             io.emit("gameUpdate", game)
         })
