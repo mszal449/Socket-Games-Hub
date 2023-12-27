@@ -28,13 +28,17 @@ const handleConnection = (io) => {
         });
 
         socket.on('selectChecker', (coords) => {
-            game.select_checker(coords)
-            socket.emit('checkerSelected', coords)
+            if (username === game.active_player()) {
+                game.select_checker(coords)
+                socket.emit('checkerSelected', coords)
+            }
         });
 
         socket.on('moveChecker', (path_and_coords) => {
-            game.validate_and_make_move(path_and_coords)
-            io.emit("gameUpdate", game)
+            if (username === game.active_player()) {
+                game.validate_and_make_move(path_and_coords)
+                io.emit("gameUpdate", game)
+            }
         })
     });
 };
