@@ -48,6 +48,23 @@ app.use('/auth', authRouter)
 const port = process.env.PORT || 3000
 
 // Start server
+
+// -------------------------------- problem jest tu --------------------------------
+// próbuję trzymać listę aktywnych pokoi na serwerze tzn. tych, w których ktoś jest i czeka na drugiego gracza
+// i tych, w których już grają dwie osoby. Potrzebuję je wyświetlać w dashboardzie.
+// No i generalnie próbuję je trzymać na serwerze, żeby mieć do nich dostęp w dashboardzie bez łączenia się do socketa.
+// W sensie wiem, że to aktualnie idzie w stronę syfu i spaghetti ale raczej będe wiedziała, jak to odkręcić jak zadziała.
+// tak czy siak mam taki endpoint, który działa, normalnie mogę sobie wyświetlić.
+let rooms = {}
+app.post('/api/rooms', (req, res) => {
+    const room = req.body;
+    res.json({ roomId: room.roomId, waiting: room.waiting });
+});
+app.get('/api/rooms', (req, res) => {
+    res.json(Object.keys(rooms));
+});
+// ---------------------------------------------------------------------------
+
 const server = app.listen(port, () => {
     console.log(`listening on http://localhost:${port}/auth/login`);
 });

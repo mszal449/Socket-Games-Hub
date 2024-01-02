@@ -3,10 +3,10 @@ import cookie from 'cookie';
 import cookieParser from "cookie-parser";
 
 const handleConnection = (io) => {
-    const games = {}; // Object to store multiple game instances based on room ids
+    const games = {}; // active and waiting rooms
 
     io.on("connection", (socket) => {
-        // Parse cookies from the request headers
+        // get data from the request headers
         let link = socket.handshake.headers.referer
         let room = link.substring(link.length-6, link.length)
         const cookies = cookie.parse(socket.handshake.headers.cookie);

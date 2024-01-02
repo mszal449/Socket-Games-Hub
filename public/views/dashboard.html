@@ -8,14 +8,8 @@
     <h3>Hello {{ user }}</h3>
     <button id="new_game_btn" class="btn btn-primary">New game</button>
     <br>
-    <div class="games">
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">Checkers</h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">Play checkers online!</h6>
-                <a href="/game/checkers" class="btn btn-primary">Play</a>
-            </div>
-        </div>
+    <div id="roomList">
+        <!-- dynamically created list of available games -->
     </div>
 </div>
 {% endblock %}
