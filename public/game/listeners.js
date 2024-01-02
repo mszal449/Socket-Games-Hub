@@ -1,6 +1,6 @@
 import game from "./game.js";
 import socket from "../socket.js";
-import {activePlayerUpdate, createBoard, playersUpdate} from "./interface.js";
+import {activePlayerUpdate, createBoard, playersUpdate, cantJoin} from "./interface.js";
 
 socket.on('checkerSelected', (coords) => {
     game.select_checker(coords)
@@ -25,4 +25,5 @@ socket.on('playerEntered', () => {
 
 socket.on('cantEnter', username => {
     console.log(`${username} can't enter the game - maximum number od players - listener`)
+    cantJoin()
 })

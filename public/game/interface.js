@@ -40,3 +40,7 @@ export function playersUpdate() {
     white.textContent = `white: ${game.white_player || wait_str}`
     black.textContent = `black: ${game.black_player || wait_str}`
 }
+
+export function cantJoin() {
+    board.textContent = "Can't join this game - two players already in"
+}
