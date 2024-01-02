@@ -1,2 +1,3 @@
 const socket = io('ws://localhost:3000')
+
 export default socket

@@ -1,5 +1,5 @@
 import game from "./game.js";
-import socket from "./socket.js";
+import socket from "../socket.js";
 
 export function getInput(x, y) {
     if (game.is_game_over()) {

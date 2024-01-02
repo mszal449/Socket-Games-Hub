@@ -1,5 +1,5 @@
 import game from "./game.js";
-import socket from "./socket.js";
+import socket from "../socket.js";
 import {activePlayerUpdate, createBoard, playersUpdate} from "./interface.js";
 
 socket.on('checkerSelected', (coords) => {
@@ -11,14 +11,15 @@ socket.on('gameOver', () => {
     console.log(`${game.get_winner()} won! - listener`)
 });
 
-
 socket.on('gameUpdate', curGame => {
+    console.log("game update")
     game.gameStateUpdate(curGame)
     createBoard()
     activePlayerUpdate()
 })
 
 socket.on('playerEntered', () => {
+    console.log("player entered")
     playersUpdate()
 })
 

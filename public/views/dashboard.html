@@ -2,11 +2,13 @@
 
 {% block content %}
 <div class="col-md-6 offset-md-3">
+    <script type="module" defer src="../dashboard.js"></script>
+
     <h1>Games</h1>
     <h3>Hello {{ user }}</h3>
+    <button id="new_game_btn" class="btn btn-primary">New game</button>
     <br>
     <div class="games">
-<!--    Image can be added -->
         <div class="card" style="width: 18rem;">
             <div class="card-body">
                 <h5 class="card-title">Checkers</h5>

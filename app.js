@@ -49,7 +49,7 @@ const port = process.env.PORT || 3000
 
 // Start server
 const server = app.listen(port, () => {
-    console.log(`listening on http://localhost:${port}/game/checkers`);
+    console.log(`listening on http://localhost:${port}/auth/login`);
 });
 
 const io = new Server(server);
