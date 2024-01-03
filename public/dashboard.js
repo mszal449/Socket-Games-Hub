@@ -2,8 +2,18 @@ import axios from './axiosInstance.js'
 const new_game_btn = document.getElementById('new_game_btn')
 const roomList = document.getElementById('roomList')
 
-// tym się nie przejmuj, ta funkcja działa elegancko
+
 function addRoomCard(roomId, waiting) {
+
+    async function enterGameAction(roomId) {
+        try {
+            await axios.patch(`/api/rooms/${roomId}`, {waiting: false});
+            console.log(`Room ${roomId} status updated on the server`);
+            window.location.href = `/game/checkers?room=${roomId}`
+        } catch (error) {
+            console.error(`Error updating room ${roomId} status:`, error);
+        }
+    }
 
     // Create card element
     const card = document.createElement('div')
@@ -31,9 +41,11 @@ function addRoomCard(roomId, waiting) {
     // Create 'Play' button if room is waiting
     if (waiting) {
         const playButton = document.createElement('a')
-        playButton.href = `/game/checkers?room=${roomId}`
         playButton.classList.add('btn', 'btn-primary')
         playButton.textContent = 'Play'
+        playButton.addEventListener('click', async () => {
+            await enterGameAction(roomId)
+        })
         cardBody.appendChild(playButton)
     }
 
@@ -44,33 +56,42 @@ function addRoomCard(roomId, waiting) {
     roomList.appendChild(card)
 }
 
-// -------------------------------- problem jest tu --------------------------------
+
 async function createRoom() {
-    // plz nie komentuj, że te numery są losowe i mogą się powtórzyć XD
-    // jak dostanę dostęp do listy pokojów, to im nie pozwolę
-    // todo: (komentarz) naprawic to bo ja zapomne
+
     function generateRoomId() {
-        return (Math.floor(Math.random() * 1000000)).toString()
+        return (Math.floor(Math.random() * (9999 - 1001) + 9999)).toString()
     }
 
-    const roomId = generateRoomId()
+    async function getRoomIds() {
+        const response = await axios.get('/api/rooms', {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        return Object.keys(response.data)
+    }
+
+    let newRoomId = generateRoomId()
+    let roomIds = await getRoomIds()
+    while (roomIds.includes(newRoomId)) {
+        newRoomId = generateRoomId()
+    }
     try {
-        const response = axios.post('/api/rooms', {
-            roomId: roomId,
+        const response = await axios.post('/api/rooms', {
+            roomId: newRoomId,
             waiting: true
         })
 
         const data = response.data
         console.log('Room created:', data)
-        addRoomCard(data.roomId, true)  //  to zadziała, jak odkomentuję
-        await getRoomsList()
-        // window.location.href = `/game/checkers?room=${data.roomId}`
+        window.location.href = `/game/checkers?room=${data.roomId}`
     } catch (error) {
-        console.error('Błąd podczas tworzenia pokoju:', error)
+        console.error('Error creating the room: ', error)
     }
 }
 
-async function getRoomsList() {
+async function refreshRoomList() {
     try {
         const response = await axios.get('/api/rooms', {
             headers: {
@@ -79,20 +100,15 @@ async function getRoomsList() {
         })
 
         const data = response.data
-        console.log(`Fetched ${data.length} rooms`)
-
-        data.forEach(room => {
-            console.log(room)
-            addRoomCard(room.roomId, room.waiting)
-        })
+        roomList.textContent = ""
+        Object.entries(data).forEach(([roomId, waiting]) => {
+            addRoomCard(roomId, waiting);
+        });
 
     } catch (error) {
-        console.error('Błąd podczas tworzenia pokoju:', error)
+        console.error('Error getting rooms list: ', error)
     }
 }
 
-
-// -------------------------------------------------------------------------------
-
 new_game_btn.addEventListener('click', createRoom)
-getRoomsList()
+refreshRoomList()

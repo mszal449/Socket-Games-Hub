@@ -1,4 +1,5 @@
 import Game from "../public/game/game-logic.js";
+// import axios from '../public/axiosInstance.js'
 import cookie from 'cookie';
 import cookieParser from "cookie-parser";
 
@@ -8,7 +9,7 @@ const handleConnection = (io) => {
     io.on("connection", (socket) => {
         // get data from the request headers
         let link = socket.handshake.headers.referer
-        let room = link.substring(link.length-6, link.length)
+        let room = link.substring(link.length-4, link.length)
         const cookies = cookie.parse(socket.handshake.headers.cookie);
         const username = cookieParser.signedCookie(cookies.user, process.env.COOKIE_SECRET);
         console.log(`User ${username} on socket ${socket.id} joined room ${room}`);
@@ -34,10 +35,15 @@ const handleConnection = (io) => {
             socket.emit('cantEnter', username);
         }
 
-        socket.on('gameOver', () => {
+        socket.on('gameOver',  /*async*/ () => {
             console.log('end game - server');
             io.to(room).emit('gameOver');
             delete games[room]
+            // try {
+            //     await axios.delete(`/api/rooms/${room}`);
+            // } catch (e) {
+            //     console.error(`Error deleting room ${room}:`, e);
+            // }
         });
 
         socket.on('selectChecker', (coords) => {
@@ -53,6 +59,11 @@ const handleConnection = (io) => {
                 io.to(room).emit("gameUpdate", game);
             }
         });
+
+        // socket.on('disconnect', () => {
+        //     console.log(`user ${username} on ${socket.id} disconnected`);
+        //     // io.to(room).broadcast.emit('playerDisconnected');
+        // });
     });
 };
 
