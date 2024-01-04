@@ -1,6 +1,5 @@
 // class representing checkers game
 // rules from: https://www.ultraboardgames.com/checkers/game-rules.php?utm_content=cmp-true
-// todo: tę planszę się powinno odwrócić w widoku, żeby pionki gracza zawsze były na dole...
 
 
 class Game {
@@ -250,7 +249,7 @@ class Game {
     }
 
     get_winner() {
-        return (this.white_checkers_num === 0 ? "white" : "black")
+        return (this.black_checkers_num === 0 ? ["white", this.white_player] : ["black", this.black_player])
     }
 
     // ---------------- starting game ----------------

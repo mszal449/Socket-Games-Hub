@@ -44,3 +44,7 @@ export function playersUpdate() {
 export function cantJoin() {
     board.textContent = "Can't join this game - two players already in"
 }
+
+export function endGame(color, userName) {
+    board.textContent = `Game ended: the winner is ${userName} (${color})`
+}

@@ -2,10 +2,7 @@ import game from "./game.js";
 import socket from "../socket.js";
 
 export function getInput(x, y) {
-    if (game.is_game_over()) {
-        // game over
-        socket.emit('gameOver')
-    } else if (game.selectedChecker === null) {
+    if (game.selectedChecker === null) {
         // selecting checker
         socket.emit('selectChecker', [x, y])
     } else {

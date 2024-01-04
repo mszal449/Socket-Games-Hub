@@ -1,5 +1,4 @@
 import Game from "../public/game/game-logic.js";
-// import axios from '../public/axiosInstance.js'
 import cookie from 'cookie';
 import cookieParser from "cookie-parser";
 
@@ -9,7 +8,7 @@ const handleConnection = (io) => {
     io.on("connection", (socket) => {
         // get data from the request headers
         let link = socket.handshake.headers.referer
-        let room = link.substring(link.length-4, link.length)
+        let room = link.substring(link.length-5, link.length)
         const cookies = cookie.parse(socket.handshake.headers.cookie);
         const username = cookieParser.signedCookie(cookies.user, process.env.COOKIE_SECRET);
         console.log(`User ${username} on socket ${socket.id} joined room ${room}`);
@@ -28,22 +27,20 @@ const handleConnection = (io) => {
         }
         if ([game.white_player, game.black_player].includes(username)) {
             // Entering a game OR refreshing screen
-            io.to(room).emit('gameUpdate', game);
+            io.to(room).emit('gameUpdate', game, room);
             io.to(room).emit('playerEntered');
         } else {
             // Can't enter the game - two players are already in
             socket.emit('cantEnter', username);
+            socket.leave(room)
         }
 
-        socket.on('gameOver',  /*async*/ () => {
-            console.log('end game - server');
-            io.to(room).emit('gameOver');
+        socket.on('gameOver', () => {
+            let [winner, color] = game.get_winner()
+            io.to(room).emit('gameOver', [winner, color]);
             delete games[room]
-            // try {
-            //     await axios.delete(`/api/rooms/${room}`);
-            // } catch (e) {
-            //     console.error(`Error deleting room ${room}:`, e);
-            // }
+            socket.emit('deleteRoom', room)
+            socket.leave(room)
         });
 
         socket.on('selectChecker', (coords) => {
@@ -59,11 +56,6 @@ const handleConnection = (io) => {
                 io.to(room).emit("gameUpdate", game);
             }
         });
-
-        // socket.on('disconnect', () => {
-        //     console.log(`user ${username} on ${socket.id} disconnected`);
-        //     // io.to(room).broadcast.emit('playerDisconnected');
-        // });
     });
 };
 
