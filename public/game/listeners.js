@@ -1,7 +1,7 @@
 import game from "./game.js";
 import socket from "../socket.js";
 import axios from '../axiosInstance.js'
-import {activePlayerUpdate, createBoard, playersUpdate, cantJoin, endGame} from "./interface.js";
+import {activePlayerUpdate, createBoard, playersUpdate, cantJoin, endGame, walkoverVictory} from "./interface.js";
 
 socket.on('checkerSelected', (coords) => {
     game.select_checker(coords)
@@ -10,7 +10,6 @@ socket.on('checkerSelected', (coords) => {
 
 socket.on('gameOver', async (winner) => {
     let [color, userName] = winner
-    console.log(`${userName} won! - listener`)
     endGame(color, userName)
 });
 
@@ -24,7 +23,6 @@ socket.on('deleteRoom', async (room) => {
 })
 
 socket.on('gameUpdate', curGame => {
-    console.log("game update")
     game.gameStateUpdate(curGame)
     createBoard()
     activePlayerUpdate()
@@ -34,11 +32,25 @@ socket.on('gameUpdate', curGame => {
 })
 
 socket.on('playerEntered', () => {
-    console.log("player entered")
     playersUpdate()
 })
 
-socket.on('cantEnter', username => {
-    console.log(`${username} can't enter the game - maximum number od players - listener`)
+socket.on('cantEnter', () => {
     cantJoin()
+})
+
+let reconnectionReceived = false; // for handling reconnection in 5 seconds
+
+socket.on('opponentDisconnected', () => {
+    reconnectionReceived = false
+    const timeout = setTimeout(() => {
+        // if opponent didn't reconnect in 5 seconds
+        socket.emit('endGameWalkover')
+        walkoverVictory()
+    }, 5000)
+    socket.on('playerEntered', () => {
+        // if opponent reconnected
+        reconnectionReceived = true;
+        clearTimeout(timeout);
+    });
 })

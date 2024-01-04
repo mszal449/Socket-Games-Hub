@@ -11,8 +11,6 @@ const handleConnection = (io) => {
         let room = link.substring(link.length-5, link.length)
         const cookies = cookie.parse(socket.handshake.headers.cookie);
         const username = cookieParser.signedCookie(cookies.user, process.env.COOKIE_SECRET);
-        console.log(`User ${username} on socket ${socket.id} joined room ${room}`);
-
         socket.join(room);
         if (!games[room]) {
             // Create a new game instance for the room if it doesn't exist
@@ -31,7 +29,7 @@ const handleConnection = (io) => {
             io.to(room).emit('playerEntered');
         } else {
             // Can't enter the game - two players are already in
-            socket.emit('cantEnter', username);
+            socket.emit('cantEnter');
             socket.leave(room)
         }
 
@@ -56,6 +54,16 @@ const handleConnection = (io) => {
                 io.to(room).emit("gameUpdate", game);
             }
         });
+
+        socket.on('disconnect', () => {
+            socket.broadcast.to(room).emit('opponentDisconnected')
+        })
+
+        socket.on('endGameWalkover', () => {
+            delete games[room]
+            socket.emit('deleteRoom', room)
+            socket.leave(room)
+        })
     });
 };
 

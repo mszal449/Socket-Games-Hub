@@ -48,3 +48,7 @@ export function cantJoin() {
 export function endGame(color, userName) {
     board.textContent = `Game ended: the winner is ${userName} (${color})`
 }
+
+export function walkoverVictory() {
+    board.textContent = `Your opponent left game - at least you won, didn't you? :)`
+}
