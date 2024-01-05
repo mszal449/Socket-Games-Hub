@@ -1,26 +1,31 @@
-<!DOCTYPE html>
-<html lang="">
-<head>
-    <title>Game</title>
-    <link rel="stylesheet" href="../views/game.css">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
+<title>{{ title }}</title>
+<div class="col-md-6 offset-md-3">
+
+    <h1 class="d-flex justify-content-center">
+        Game Board
+    </h1>
+    <h3 id="activePlayer" class="d-flex justify-content-center">
+        <!-- [color] turn! -->
+    </h3>
+    <h4 id="p_white" class="d-flex justify-content-center">
+        <!-- white players name -->
+    </h4>
+    <h4 id="p_black" class="d-flex justify-content-center">
+        <!-- black players name -->
+    </h4>
+    <br>
+    <div class="d-flex justify-content-center">
+        <table id="board">
+            <!-- The game board will be generated dynamically here -->
+        </table>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"
             integrity="sha512-Xm9qbB6Pu06k3PUwPj785dyTl6oHxgsv9nHp7ej7nCpAqGZT3OZpsELuCYX05DdonFpTlBpXMOxjavIAIUwr0w=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="module" defer src="../game/listeners.js"></script>
-    <h1>Game Board</h1>
-    <h3 id="activePlayer">
-        <!-- [color] turn! -->
-    </h3>
-    <h4 id="p_white">
-        <!-- white player name -->
-    </h4>
-    <h4 id="p_black">
-        <!-- black player name -->
-    </h4>
-    <table id="board">
-        <!-- The game board will be generated dynamically here -->
-    </table>
-</body>
-</html>
+    <link rel="stylesheet" href="../views/game.css">
+</div>
+{% endblock %}

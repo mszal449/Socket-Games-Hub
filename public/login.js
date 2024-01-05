@@ -24,22 +24,22 @@ form.addEventListener('submit', async (e) => {
         // Redirect or handle error
         if (response.data.error) {
             // Failure, show alerts
-            displayAlert(response.data.error);
+            displayAlert(response.data.error)
         } else {
             location.assign(response.data.returnUrl)
         }
     } catch (error) {
         // Handle errors
         if (error.response && error.response.data) {
-            displayAlert(error.response.data.error);
+            displayAlert(error.response.data.error)
         } else {
-            displayAlert('Request failed. Please try again later.');
+            displayAlert('Request failed. Please try again later.')
         }
     }
 })
 
 // Display alert in alerts element
-const displayAlert = (message) => {
+function displayAlert(message) {
     const alertElement = document.createElement('div')
     alertElement.classList.add('alert', 'alert-danger')
     alertElement.role = 'alert'
@@ -50,6 +50,6 @@ const displayAlert = (message) => {
 // Clear all existing alerts
 function clearAlerts() {
     while (alerts.firstChild) {
-        alerts.removeChild(alerts.firstChild);
+        alerts.removeChild(alerts.firstChild)
     }
 }

@@ -2,7 +2,7 @@ import User from '../models/user.js'
 import { StatusCodes } from 'http-status-codes'
 
 // Register user
-const register = async (req, res) => {
+async function register(req, res) {
     const { username, password1, password2} = req.body
     const returnUrl = req.params.returnUrl || req.body.returnUrl
 
@@ -50,7 +50,7 @@ const register = async (req, res) => {
 }
 
 // Login an existing user
-const login = async (req, res) => {
+async function login(req, res) {
     const { username, password } = req.body
     const returnUrl = req.params.returnUrl || req.body.returnUrl
 
@@ -82,7 +82,7 @@ const login = async (req, res) => {
 }
 
 // Log out user
-const logout = (req, res) => {
+function logout(req, res) {
     res.clearCookie('user').redirect('/auth/login')
 }
 

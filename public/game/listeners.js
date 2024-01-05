@@ -1,24 +1,25 @@
-import game from "./game.js";
-import socket from "../socket.js";
+import game from "./game.js"
+import socket from "../socket.js"
 import axios from '../axiosInstance.js'
-import {activePlayerUpdate, createBoard, playersUpdate, cantJoin, endGame, walkoverVictory} from "./interface.js";
+import {activePlayerUpdate, createBoard, playersUpdate, cantJoin, endGame, walkoverVictory} from "./interface.js"
 
+// ============ Socket game integration ============
 socket.on('checkerSelected', (coords) => {
     game.select_checker(coords)
-    createBoard();
-});
+    createBoard()
+})
 
 socket.on('gameOver', async (winner) => {
     let [color, userName] = winner
     endGame(color, userName)
-});
+})
 
 socket.on('deleteRoom', async (room) => {
     try {
-        await axios.delete(`/api/rooms/${room}`);
+        await axios.delete(`/game/rooms/${room}`)
         console.log(`${room} deleted`)
     } catch (e) {
-        console.error(`Error deleting room ${room}:`, e);
+        console.error(`Error deleting room ${room}:`, e)
     }
 })
 
@@ -39,7 +40,7 @@ socket.on('cantEnter', () => {
     cantJoin()
 })
 
-let reconnectionReceived = false; // for handling reconnection in 5 seconds
+let reconnectionReceived = false // for handling reconnection in 5 seconds
 
 socket.on('opponentDisconnected', () => {
     reconnectionReceived = false
@@ -50,7 +51,7 @@ socket.on('opponentDisconnected', () => {
     }, 5000)
     socket.on('playerEntered', () => {
         // if opponent reconnected
-        reconnectionReceived = true;
-        clearTimeout(timeout);
-    });
+        reconnectionReceived = true
+        clearTimeout(timeout)
+    })
 })

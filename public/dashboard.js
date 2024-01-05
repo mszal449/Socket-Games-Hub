@@ -7,7 +7,7 @@ function addRoomCard(roomId, waiting) {
 
     async function enterGameAction(roomId) {
         try {
-            await axios.patch(`/api/rooms/${roomId}`, {waiting: false});
+            await axios.patch(`/game/rooms/${roomId}`, {waiting: false});
             console.log(`Room ${roomId} status updated on the server`);
             window.location.href = `/game/checkers?room=${roomId}`
         } catch (error) {
@@ -64,7 +64,7 @@ async function createRoom() {
     }
 
     async function getRoomIds() {
-        const response = await axios.get('/api/rooms', {
+        const response = await axios.get('/game/rooms', {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -78,7 +78,7 @@ async function createRoom() {
         newRoomId = generateRoomId()
     }
     try {
-        const response = await axios.post('/api/rooms', {
+        const response = await axios.post('/game/rooms', {
             roomId: newRoomId,
             waiting: true
         })
@@ -93,7 +93,7 @@ async function createRoom() {
 
 async function refreshRoomList() {
     try {
-        const response = await axios.get('/api/rooms', {
+        const response = await axios.get('/game/rooms', {
             headers: {
                 'Content-Type': 'application/json',
             },

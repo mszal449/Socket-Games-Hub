@@ -1,5 +1,5 @@
-import Game from "./game-logic.js";
+import Game from "./game-logic.js"
 
-let game = new Game();
+let game = new Game()
 
 export default game

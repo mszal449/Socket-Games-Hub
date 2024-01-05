@@ -1,5 +1,5 @@
 // Authentication middleware
-const auth = async (req, res, next) => {
+async function auth(req, res, next) {
     if (req.signedCookies.user) {
         req.user = req.signedCookies.user
         next()

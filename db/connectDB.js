@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 // Connect to the database
-const connectDB = (url) => {
+function connectDB(url) {
     mongoose.connect(url, {})
 }
 

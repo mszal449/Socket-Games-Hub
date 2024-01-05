@@ -67,7 +67,7 @@ class Game {
     }
 
     is_active() {
-        return ((this.black_player !== null) && (this.white_player !== null));
+        return ((this.black_player !== null) && (this.white_player !== null))
     }
 
     in_selected_checker_paths(x, y) {
@@ -101,11 +101,11 @@ class Game {
     // ---------------- checking capture obligation logic ----------------
 
     check_capture_obligation(x, y, old_x, old_y, is_king) {
-        let res = []; // list of available paths with capture for checker on [x, y]
-        let yis = this.white_turn ? [-1] : [1];
+        let res = [] // list of available paths with capture for checker on [x, y]
+        let yis = this.white_turn ? [-1] : [1]
 
         if (is_king) {
-            yis = [-1, 1]; // for kings, we need to check backwards
+            yis = [-1, 1] // for kings, we need to check backwards
         }
 
         ([-1, 1]).forEach(xi => {
@@ -117,28 +117,28 @@ class Game {
                     this.is_empty(x + 2 * xi, y + 2 * yi) &&
                     ((old_x !== x + 2 * xi) || (old_y !== y + 2 * yi))
                 ) {
-                    let new_arr = this.check_capture_obligation(x + 2 * xi, y + 2 * yi, x, y, is_king);
+                    let new_arr = this.check_capture_obligation(x + 2 * xi, y + 2 * yi, x, y, is_king)
                     if (new_arr.length === 0) {
                         // no more captures available, end path with current square
-                        res.push([[x + 2 * xi, y + 2 * yi]]);
+                        res.push([[x + 2 * xi, y + 2 * yi]])
                     } else {
                         // add current square to path
                         new_arr.forEach(path => {
-                            path.unshift([x + 2 * xi, y + 2 * yi]);
-                            res.push(path);
-                        });
+                            path.unshift([x + 2 * xi, y + 2 * yi])
+                            res.push(path)
+                        })
                     }
                 }
-            });
-        });
-        return res;
+            })
+        })
+        return res
     }
 
 
     // function checking capture obligation for every active checker
     // returns list of checkers that can capture and lists from check_capture_obligation for them
     check_capture_obligation_for_all() {
-        let res = [];   //  it will be the list of possible moves with capture
+        let res = [];   // list of possible moves with capture
         ([...Array(8).keys()]).forEach(y => {
             ([...Array(8).keys()].filter(x => x % 2 !== y % 2)).forEach(x => {
                 if (this.is_active_color(x, y)) {
@@ -146,7 +146,7 @@ class Game {
                     if (path.length > 0) {
                         res.push({
                             checker: [x, y],    // coordinates of checker that can capture
-                            paths: path      // possible coordinates to go for it
+                            paths: path         // possible coordinates to go for it
                         })
                     }
                 }
@@ -157,8 +157,8 @@ class Game {
 
     // ---------------- getting list of possible moves without capture ----------------
     get_available_moves(x, y) {
-        let res = [];
-        let yis;
+        let res = []
+        let yis
         if (this.is_king(x, y)) {
             yis = [-1, 1]
         } else {
@@ -170,11 +170,11 @@ class Game {
                     res.push([x + xi, y + yi])
                 }
             })
-        });
+        })
         return {
             checker: [x, y],
             paths: [res]
-        };
+        }
     }
 
     get_available_moves_for_all() {
@@ -192,36 +192,36 @@ class Game {
     // ---------------- moves validation ----------------
     move_validation_start(coords, moves_list) {
         let old_x, old_y
-        [old_x, old_y] = coords;
+        [old_x, old_y] = coords
 
         for (let move of moves_list) {
             if (move.checker[0] === old_x && move.checker[1] === old_y) {
-                return move;
+                return move
             }
         }
-        return false;
+        return false
     }
 
     move_validation_target(coords, moves_paths) {
         let new_x, new_y
-        [new_x, new_y] = coords;
+        [new_x, new_y] = coords
 
         for (let path of moves_paths) {
             for (let i = 0; i < path.length; i++) {
                 if (path[i][0] === new_x && path[i][1] === new_y) {
-                    return [path, i];
+                    return [path, i]
                 }
             }
         }
-        return false;
+        return false
     }
 
     // ---------------- making moves on board ----------------
 
     make_moves(path, target_index) {
         for (let move of path.slice(0, target_index+1)) {
-            let [old_x, old_y] = this.selectedChecker.checker;
-            let [new_x, new_y] = move;
+            let [old_x, old_y] = this.selectedChecker.checker
+            let [new_x, new_y] = move
 
             // moving checker
             let checker = this.board[old_y][old_x]
@@ -291,4 +291,4 @@ class Game {
         this.end_turn()
     }
 }
-export default Game;
+export default Game

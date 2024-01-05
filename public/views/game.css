@@ -1,27 +1,36 @@
 .selected {
-    background-color: #357c37;
+    background-color: #92C7CF;
+    border: none; /* Remove the border */
 }
+
 .target {
-    background-color: #1b3b1b;
+    background-color: #AAD7D9;
 }
+
 .background-0 {
     background-color: #9d9d9d;
 }
+
 .background-1 {
     background-color: #464646;
 }
+
 .color-0 {
     color: #000000;
 }
+
 .color-1 {
     color: #fcfcfc;
 }
+
 .color-2 {
     color: transparent;
 }
+
 table {
     border-collapse: collapse;
 }
+
 td {
     font-size: larger;
     border: 1px solid #464646;
@@ -30,4 +39,62 @@ td {
     text-align: center;
     cursor: pointer;
     font-weight: bold;
+    position: relative;
 }
+
+.circle-white {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.circle-black {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.kings-white {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #bababa;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.circle-black {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+.kings-black {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #262626;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+

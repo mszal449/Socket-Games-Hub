@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+<title>{{ title }}</title>
 <div class="col-md-6 offset-md-3">
     <script type="module" defer src="../dashboard.js"></script>
 
-    <h1>Games</h1>
     <h3>Hello {{ user }}</h3>
     <button id="new_game_btn" class="btn btn-primary">New game</button>
     <br>

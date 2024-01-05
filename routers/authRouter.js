@@ -32,4 +32,5 @@ router.get('/logout', auth, logout)
 router.post('/register', register)
 router.post('/login', login)
 
+
 export default router
