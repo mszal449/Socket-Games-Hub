@@ -1,6 +1,8 @@
 import Game from "../public/game/game-logic.js"
 import cookie from 'cookie'
 import cookieParser from "cookie-parser"
+import {rooms} from '../routers/GameRouter.js'
+
 
 function handleConnection(io) {
     const games = {} // active and waiting rooms
@@ -11,10 +13,14 @@ function handleConnection(io) {
         let room = link.substring(link.length-5, link.length)
         const cookies = cookie.parse(socket.handshake.headers.cookie)
         const username = cookieParser.signedCookie(cookies.user, process.env.COOKIE_SECRET)
-        socket.join(room)
-        if (!games[room]) {
-            // Create a new game instance for the room if it doesn't exist
-            games[room] = new Game()
+        if (room in rooms) {
+            socket.join(room)
+            if (!games[room]) {
+                // Create a new game instance for the room if it doesn't exist
+                games[room] = new Game()
+            }
+        } else {
+            socket.emit('redirect', '/game/dashboard')
         }
 
         const game = games[room]

@@ -48,4 +48,4 @@ router.delete('/rooms/:roomId', (req, res) => {
 })
 
 
-export default router
+export {router, rooms}

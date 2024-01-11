@@ -14,9 +14,10 @@ import cors from 'cors'
 // Project imports
 import connectDB from './db/connectDB.js'
 import authRouter from './routers/authRouter.js'
-import gameRouter from './routers/gameRouter.js'
+import {router as gameRouter} from './routers/GameRouter.js'
 import auth from './middleware/authentication.js'
 import handleConnection from "./socket/connection.js"
+
 
 // Serve static files from the public directory
 const app = express()
