@@ -59,7 +59,12 @@ function handleConnection(io) {
             })
 
             socket.on('disconnect', () => {
-                socket.broadcast.to(room).emit('opponentDisconnected')
+                if (game.is_active()) {
+                    socket.broadcast.to(room).emit('opponentDisconnected')
+                } else {
+                    delete rooms[room]
+                    delete games[room]
+                }
             })
 
             socket.on('endGameWalkover', () => {
